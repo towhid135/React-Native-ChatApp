@@ -1,11 +1,13 @@
 // @refresh state
-import React,{useState,useEffect} from 'react';
+import React,{useState,useEffect,useCallback,useRef} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,TextInput,Button } from 'react-native';
+import { StyleSheet, Text, View,TextInput,Button,LogBox, YellowBox } from 'react-native';
 import * as firebase from 'firebase/app';
-import { getDatabase, push, ref, set } from "firebase/database";
+import { getDatabase, push, ref, onValue } from "firebase/database";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GiftedChat } from 'react-native-gifted-chat'
+
+LogBox.ignoreLogs(['Setting a timer for a long period of time']);
 
 const firebaseConfig = {
   apiKey: "AIzaSyDoo5lAZoXqqgLOkkfjE_0bzmM-GqMN_ms",
@@ -17,6 +19,7 @@ const firebaseConfig = {
 };
 
 const app = firebase.initializeApp(firebaseConfig);
+const db = getDatabase();
 
 
 
@@ -25,15 +28,35 @@ export default function App() {
   const [name,setName] = useState('');
   const [messages,setMessages] = useState([]);
 
+  var response = {};
   useEffect(()=>{
     readUser();
+    const starCountRef = ref(db, 'chat/');
+
+    const unsubscribe = onValue(starCountRef, (snapshot) => {
+     const data = snapshot.val();
+     const allMessages = Object.values(data);
+     setMessages([...allMessages]);
+     //console.log('onValue data',data);
+    });
+
+    return () => unsubscribe();
 
   },[]);
+
+  const appendMessages = useCallback(
+    (messages) => {
+        setMessages((previousMessages) => GiftedChat.append(previousMessages, messages))
+    },
+    [messages]
+ )
 
   const readUser = async () =>{
     const userInfo = await AsyncStorage.getItem('user');
     if(userInfo){
-      setUser(JSON.parse(userInfo))
+      setUser({
+        ...JSON.parse(userInfo)}
+        )
     }
   }
 
@@ -47,11 +70,14 @@ export default function App() {
   }
 
   const handleSend = async (message) =>{
+      let sentMessage = {...message[0], createdAt: message[0].createdAt.toISOString() }
+      //let sentMessage = message;
+      //console.log('sentMessage',sentMessage);
+      await push(ref(db, 'chat/'),
+        sentMessage,
+      );
 
-      const db = getDatabase();
-      await push(ref(db, 'chat/'), {
-        message: message,
-      });
+    setMessages((previousMessages) => GiftedChat.append(previousMessages,message))
 
   }
 
@@ -72,7 +98,13 @@ export default function App() {
   }
 
   return (
-    <GiftedChat messages={messages} user={user} onSend={handleSend} />
+    <GiftedChat 
+    messages={messages} 
+    user={user} 
+    onSend={handleSend} 
+    isLoadingEarlier={true}
+    showUserAvatar={true}
+    />
   );
 }
 
