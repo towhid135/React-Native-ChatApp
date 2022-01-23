@@ -1,9 +1,9 @@
 // @refresh state
 import React,{useState,useEffect,useCallback,useRef} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,TextInput,Button,LogBox, YellowBox } from 'react-native';
+import { StyleSheet, Text, View,TextInput,Button,LogBox } from 'react-native';
 import * as firebase from 'firebase/app';
-import { getDatabase, push, ref, onValue } from "firebase/database";
+import { getDatabase, push, ref, onValue, onChildAdded, get, child } from "firebase/database";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GiftedChat } from 'react-native-gifted-chat'
 
@@ -22,34 +22,52 @@ const app = firebase.initializeApp(firebaseConfig);
 const db = getDatabase();
 
 
-
 export default function App() {
   const [user,setUser] = useState(null);
   const [name,setName] = useState('');
   const [messages,setMessages] = useState([]);
+  const length = useRef(0);
 
   var response = {};
   useEffect(()=>{
     readUser();
     const starCountRef = ref(db, 'chat/');
+    get(child(ref(db),'chat')).then((snapshot) => {
+      if(snapshot.exists()){
+        const data = snapshot.val();
+        const allMessages = [];
+        for(let key in data){
+          data[key] = {...data[key],createdAt: new Date(data[key].createdAt)}
+          allMessages.push(data[key]);
+        }
+        allMessages.sort((a,b) => b.createdAt - a.createdAt);
+        length.current = allMessages.length;
+        setMessages(allMessages);
+      }
+      else{
+        length.current = 1;
+      }
+    }).catch((err) =>{console.log(err)})
 
-    const unsubscribe = onValue(starCountRef, (snapshot) => {
+    const unsubscribe = onChildAdded(starCountRef, (snapshot) => {
      const data = snapshot.val();
-     const allMessages = Object.values(data);
-     setMessages([...allMessages]);
-     //console.log('onValue data',data);
+     //console.log('messages length', length.current);
+     if (length.current > 0) {
+           //console.log('single message',data);
+           appendMessages(data);
+       }
     });
 
     return () => unsubscribe();
-
   },[]);
 
   const appendMessages = useCallback(
-    (messages) => {
-        setMessages((previousMessages) => GiftedChat.append(previousMessages, messages))
+
+    (message) => {
+        setMessages((previousMessages) => GiftedChat.append(previousMessages, message))
     },
-    [messages]
- )
+    []
+  )
 
   const readUser = async () =>{
     const userInfo = await AsyncStorage.getItem('user');
@@ -71,13 +89,9 @@ export default function App() {
 
   const handleSend = async (message) =>{
       let sentMessage = {...message[0], createdAt: message[0].createdAt.toISOString() }
-      //let sentMessage = message;
-      //console.log('sentMessage',sentMessage);
       await push(ref(db, 'chat/'),
         sentMessage,
       );
-
-    setMessages((previousMessages) => GiftedChat.append(previousMessages,message))
 
   }
 
@@ -102,7 +116,6 @@ export default function App() {
     messages={messages} 
     user={user} 
     onSend={handleSend} 
-    isLoadingEarlier={true}
     showUserAvatar={true}
     />
   );
