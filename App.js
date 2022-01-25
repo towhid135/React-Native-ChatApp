@@ -30,6 +30,7 @@ export default function App() {
 
   var response = {};
   useEffect(()=>{
+    //console.log('entered to the useEffect');
     readUser();
     const starCountRef = ref(db, 'chat/');
     get(child(ref(db),'chat')).then((snapshot) => {
@@ -41,10 +42,12 @@ export default function App() {
           allMessages.push(data[key]);
         }
         allMessages.sort((a,b) => b.createdAt - a.createdAt);
+        //console.log(allMessages);
         length.current = allMessages.length;
         setMessages(allMessages);
       }
       else{
+        console.log('snapshot does not exists');
         length.current = 1;
       }
     }).catch((err) =>{console.log(err)})
@@ -105,7 +108,7 @@ export default function App() {
          />
           <Button 
           onPress={handlePress} 
-          title="Enter the chat" 
+          title="Enter to the chat" 
           />
       </View>
     )
