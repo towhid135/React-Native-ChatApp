@@ -26,42 +26,81 @@ export default function App() {
   const [user,setUser] = useState(null);
   const [name,setName] = useState('');
   const [messages,setMessages] = useState([]);
-  const length = useRef(0);
+  const lastMessageDate = useRef(null);
 
   var response = {};
   useEffect(()=>{
     //console.log('entered to the useEffect');
+    var allMessages = [];
     readUser();
     const starCountRef = ref(db, 'chat/');
-    get(child(ref(db),'chat')).then((snapshot) => {
-      if(snapshot.exists()){
-        const data = snapshot.val();
-        const allMessages = [];
-        for(let key in data){
-          data[key] = {...data[key],createdAt: new Date(data[key].createdAt)}
-          allMessages.push(data[key]);
+    const fetchData = async () =>{
+      console.log('entered into the fetchdata');
+      const response = await fetch('https://chatapp-7d527-default-rtdb.firebaseio.com/chat.json');
+      if(response.ok){
+        console.log('inside response.ok');
+        const data = await response.json();
+        //console.log('data', data);
+        if(data)
+        {
+            for(let key in data){
+              data[key] = {...data[key],createdAt: new Date(data[key].createdAt)}
+              allMessages.push(data[key]);
+            }
+            allMessages.sort((a,b) => b.createdAt - a.createdAt);
+            //console.log(allMessages[0]);
+            lastMessageDate.current = new Date(allMessages[0].createdAt);
+            setMessages(allMessages);
+            allMessages = [];
+            //console.log('resData , length', data, length.current);
         }
-        allMessages.sort((a,b) => b.createdAt - a.createdAt);
-        //console.log(allMessages);
-        length.current = allMessages.length;
-        setMessages(allMessages);
+        else{
+            console.log('snapshot does not exists');
+            //length.current = 1;
+        }
       }
       else{
-        console.log('snapshot does not exists');
-        length.current = 1;
+        console.log('Facing error during data fetching');
       }
-    }).catch((err) =>{console.log(err)})
+    }
+    fetchData();
+  
+    // get(child(ref(db),'chat')).then((snapshot) => {
+    //   if(snapshot.exists()){
+    //     const data = snapshot.val();
+    //     const allMessages = [];
+    //     for(let key in data){
+    //       data[key] = {...data[key],createdAt: new Date(data[key].createdAt)}
+    //       allMessages.push(data[key]);
+    //     }
+    //     allMessages.sort((a,b) => b.createdAt - a.createdAt);
+    //     //console.log(allMessages);
+    //     length.current = allMessages.length;
+    //     setMessages(allMessages);
+    //   }
+    //   else{
+    //     console.log('snapshot does not exists');
+    //     length.current = 1;
+    //   }
+    // }).catch((err) =>{console.log(err)})
 
-    const unsubscribe = onChildAdded(starCountRef, (snapshot) => {
-     const data = snapshot.val();
-     //console.log('messages length', length.current);
-     if (length.current > 0) {
-           //console.log('single message',data);
-           appendMessages(data);
-       }
-    });
+     const unsubscribe = onChildAdded(starCountRef, (snapshot) => {
+        const data = snapshot.val();
+        //console.log('length from single messge',lastMessageDate.current);
+        const dataDate = new Date( data.createdAt );
+          if( (lastMessageDate.current < dataDate) || lastMessageDate.current === null ){
+              //console.log('inside second if of single message');
+              //console.log('single message',data);
+              lastMessageDate.current = dataDate;
+              appendMessages(data);
+          }
+        
+        }
+    )
 
-    return () => unsubscribe();
+  return () => unsubscribe();
+
+   
   },[]);
 
   const appendMessages = useCallback(
