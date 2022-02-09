@@ -1,32 +1,16 @@
 # Note Book
 
-This notebook is a cross-platform application. It was built with the help of
-react-native and expo. Features of this application are given below:
-* User's can register with a **valid** Gmail.
-* User's will get a **verification email**.
-* Only **verified** users can log in.
-* User's can retrieve a forgotten password.
-* User's can **add** any note and select **page color**, **text color** and **font style**.
-* Saved notes will be stored in the **firebase**.
-* User's can **view**, **edit** and **delete** the saved notes.
-* User's will get a nice user experience.
+This is a simple group chat app. I have built this app with the help of React Native and Expo environment. Features of this application are given below:
+* Users can enter to the group by inserting a user name.
+* User can **Send** messages and **See** other's messages.
 
 ## Objective
 
 The objective of this project is to learn:
-* Creating **functional components**.
-* Building reusable **custom components**.
-* Using **custom font**.
-* Using **Apploading component**.
-* Using **Activity Indicator**.
-* Using **Firebase** for **Authentication** and **storing** data.
-* **Sing in** and **Sign up** mechanism.
-* **Email verification** and **password retrieval**.
-* Email and password **validation** with **regex** and condition.
-* Handling server-side response with the help of **Rest API**.
-* Managing **Redux Store** (Creating and managing **reducers** and **dispatching actions**).
-* Using **Redux-Thunk** for returning the **async function** from the action creator function.
-* Using different react hooks like: **useState**, **useEffect**, **useLayoutEffect**,**useReducer**, etc.
+* **React-native-gifted-chat UI**.
+* Handling **real-time response**.
+* **Fetching newly added message** from the firebase real-time database.
+* Users name and Id storing using **Async-Storage**.
 
 ## Requirements
 * PC have latest **"Node.js"** installed.
@@ -42,10 +26,9 @@ The objective of this project is to learn:
 
 ## Screenshots
 
-Login             |  Login Indicator          | Register
-:-------------------------:|:-------------------------:|:-------------------------
-![](https://github.com/towhid135/React-Native-TODO-2/blob/main/Screenshot/Login.jpg)  |  ![](https://github.com/towhid135/React-Native-TODO-2/blob/main/Screenshot/Spinner-Login.jpg) |  ![](https://github.com/towhid135/React-Native-TODO-2/blob/main/Screenshot/Register.jpg)
-
+Entry             |  Chat          
+:-------------------------:|:-------------------------
+![](https://github.com/towhid135/React-Native-TODO-2/blob/main/Screenshot/Login.jpg)  |  ![](https://github.com/towhid135/React-Native-TODO-2/blob/main/Screenshot/Spinner-Login.jpg)
 Forgot pass             |  Notes Loading          | Empty
 :-------------------------:|:-------------------------:|:-------------------------
 ![](https://github.com/towhid135/React-Native-TODO-2/blob/main/Screenshot/Forgot%20pass.jpg) |  ![](https://github.com/towhid135/React-Native-TODO-2/blob/main/Screenshot/Notes%20Loading.jpg) |  ![](https://github.com/towhid135/React-Native-TODO-2/blob/main/Screenshot/Initial%20View.jpg)
