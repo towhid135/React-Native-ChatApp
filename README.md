@@ -1,16 +1,16 @@
 # Note Book
 
 This is a simple group chat app. I have built this app with the help of React Native and Expo environment. Features of this application are given below:
-* Users can enter to the group by inserting a user name.
-* User can **Send** messages and **See** other's messages.
+* Users can enter the group by inserting a user name.
+* User can **Send** messages and **View** other's messages.
 
 ## Objective
 
 The objective of this project is to learn:
 * **React-native-gifted-chat UI**.
 * Handling **real-time response**.
-* **Fetching newly added message** from the firebase real-time database.
-* Users name and Id storing using **Async-Storage**.
+* **Fetching newly added message** from the firebase realtime database.
+* Storing users' names and Id using **Async-Storage**.
 
 ## Requirements
 * PC have latest **"Node.js"** installed.
