@@ -1,8 +1,9 @@
 {
   "expo": {
     "name": "ChatApp",
-    "slug": "ChatApp",
+    "slug": "Chat-App",
     "version": "1.0.0",
+    "description": "This is a simple group chat application",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {

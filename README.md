@@ -1,5 +1,5 @@
 # ChatApp
-
+##### Expo Published Link: https://expo.dev/@towhid135/Chat-App
 This is a simple group chat app. I have built this app with the help of React Native and Expo environment. Features of this application are given below:
 * Users can enter the group by inserting a user name.
 * User can **Send** messages and **View** other's messages.
